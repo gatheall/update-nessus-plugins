@@ -75,6 +75,14 @@ interpreter support the '-p' option.  This is true of the version
 currently in CVS and, I expect, the next stable release of Nessus after
 version 2.0.6a. 
 
+You need a working version of C<nessus-update-plugins> to use this
+script.  If you are having trouble getting that to work, please join
+C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
+assistance there.  Note that, if you compiled Nessus from source,
+C<nessus-update-plugins> will not be installed unless
+C<nessus-plugins/configure> can find either C<lynx> or C<wget> on your
+system or you invoked it with the option C<--with-fetchcmd=&lt;cmd&gt;>. 
+
 
 =head1 DIAGNOSTICS
 
@@ -101,6 +109,11 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+30-Jun-2003, v1.01, George A. Theall
+    o Fixed a glitch that could lead to erroneous information about
+      plugins being reported because comments in scripts were not
+      ignored.
 
 04-Jun-2003, v1.00, George A. Theall
     o Initial version.
@@ -282,15 +295,35 @@ if ($summary) {
             $status = 'added';
         }
 
-        # Get info about the new plugin.
+        # Read new plugin.
         #
         # nb: we've already chdir'd into $plugin_dir.
-        print STDERR "debug: getting summary of '$plugin'.\n" if $DEBUG;
+        print STDERR "debug: reading contents of '$plugin'.\n" if $DEBUG;
         my @report;
         open(FILE, $plugin) or croak "Can't read $plugin - $!\n";
         my $contents;
         { local $/; $contents = <FILE>; }
         close(FILE);
+
+        # If plugin was changed, compute diffs.
+        my $diffs;
+        if ($status eq 'changed') {
+            print STDERR "debug:   computing diffs.\n" if $DEBUG;
+            my @old = split(/\n/, $tar->get_content($plugin));
+
+            my @new;
+            open(NEW, $plugin) or croak "Can't read from '$plugin' - $!\n";
+            chomp(@new = <NEW>);
+            close(NEW);
+
+            $diffs = diff(\@old, \@new);
+        }
+
+        # Get info about the new plugin.
+        #
+        # nb: remove comment lines so any info they might hold is not 
+        #     erroneously reported.
+        $contents =~ s/^#.*\n//mg;
         my %info;
         for my $var ('id', 'name', 'family', 'category', 'summary', 'version', 'cve_id') {
             next unless ($contents =~ /script_${var}\s*\((.+?)\);/s);
@@ -306,6 +339,9 @@ if ($summary) {
                 if ($contents =~ /$var\[\"$lang_pref\"\]\s*=\s*(.+?);/) {
                     $val = $1;
                 }
+                else {
+                    $val = 'n/a';
+                }
             }
             $val =~ s/^\s*"\s*(.+)\s*"\s*$/$1/;
             $val = $categories{$val}
@@ -314,20 +350,6 @@ if ($summary) {
             $val =~ s/\"//g if ($var eq 'cve_id');
 
             $info{$var} = $val;
-        }
-
-        # If plugin was changed, compute diffs.
-        my $diffs;
-        if ($status eq 'changed') {
-            print STDERR "debug:   computing diffs.\n" if $DEBUG;
-            my @old = split(/\n/, $tar->get_content($plugin));
-
-            my @new;
-            open(NEW, $plugin) or croak "Can't read from '$plugin' - $!\n";
-            chomp(@new = <NEW>);
-            close(NEW);
-
-            $diffs = diff(\@old, \@new);
         }
 
         # Print report.

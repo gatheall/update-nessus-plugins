@@ -11,6 +11,14 @@
 <!--#endif -->
 
 
+<H4 ALIGN="center">
+   <A HREF="/">TifaWARE</A> |
+   <A HREF="../">Perl Programs</A> | 
+   update-nessus-plugins
+</H4>
+
+
+<HR>
 <H2>update-nessus-plugins</H2>
 
 <H3>Introduction</H3>
@@ -20,21 +28,23 @@ free remote vulnerability scanner.  While its initial cost is certainly
 attractive, arguably its main advantage is its extensive and continually
 evolving plugin database of vulnerability checks.  Nessus comes with a
 shell script to retrieve the latest set of plugins from a central
-repository -- <B>nessus-update-plugins</B> -- and I would imagine most
-Nessus users run this fairly often to keep their plugins up-to-date.</P>
+repository -- <CODE>nessus-update-plugins</CODE> -- and I would imagine
+most Nessus users run this fairly often to keep their plugins
+up-to-date.</P>
 
 <P>While the script does at fine job, it does have a couple of
 limitations, in my opinion: it does not back up existing plugins, it
 doesn't attempt to validate new or changed plugins, and it doesn't
 provide much information on changes.  I designed
 <B>update-nessus-plugins</B> to address these limitations and designed
-it to call <B>nessus-update-plugins</B> to do the actual updates to
-avoid any problem of compatibility.</P>
+it to call <CODE>nessus-update-plugins</CODE> to do the actual updates
+to avoid any problem of compatibility.</P>
 
 <P><B>update-nessus-plugins</B> is written in Perl and calls
-<B>nessus-update-plugins</B> to actually update the plugins.  It should work
-on any unix-like system with Perl 5 and a working copy of
-<B>nessus-update-plugins</B>.  It also requires the following modules:</P>
+<CODE>nessus-update-plugins</CODE> to actually update the plugins.  It
+should work on any unix-like system with Perl 5 and a working copy of
+<CODE>nessus-update-plugins</CODE>.  It also requires the following
+modules:</P>
 
 <UL>
    <LI><CODE>Algorithm::Diff</CODE></LI>
@@ -63,7 +73,7 @@ them yourself.</P>
       <A HREF="update-nessus-plugins.asc">GPG signature</A> against
       <A HREF="/~theall/gpg.html">my current GPG key</A>.</LI>
    <LI>Verify ownership and permissions on the script - it will need to
-      run as root to run <B>nessus-update-plugins</B>.</LI>
+      run as root to run <CODE>nessus-update-plugins</CODE>.</LI>
    <LI>You may wish to edit the script and set <CODE>$lang_pref</CODE> and
       <CODE>$plugins_dir</CODE> to suit your tastes.</LI>
 </OL>
@@ -105,7 +115,7 @@ variables defined in the script itself:</P>
 <DL>
    <DT><CODE>update-nessus-plugins</CODE></DT>
    <DD>updates nessus plugins. Note: this does nothing more than call
-      <B>nessus-update-plugins</B>.</DD>
+      <CODE>nessus-update-plugins</CODE>.</DD>
 
    <DT><CODE>update-nessus-plugins -b</CODE></DT>
    <DD>creates a backup of old plugins and updates plugins.</DD>
@@ -131,6 +141,15 @@ interpreter support the <CODE>-p</CODE> option. This is true of the
 version currently in CVS and, I expect, the next stable release of
 Nessus after version 2.0.6a.</P>
 
+<P>You need a working version of <CODE>nessus-update-plugins</CODE> to
+use this script.  If you are having trouble getting that to work, please
+join <A HREF="http://list.nessus.org/">nessus@list.nessus.org</A> and
+ask for assistance there.  Note that, if you compiled Nessus from
+source, <CODE>nessus-update-plugins</CODE> will not be installed unless
+<CODE>nessus-plugins/configure</CODE> can find either <CODE>lynx</CODE>
+or <CODE>wget</CODE> on your system or you invoked it with the option
+<CODE>--with-fetchcmd=&lt;cmd&gt;</CODE>.</P>
+
 
 <H3>Copyright and License</H3>
 
@@ -152,6 +171,18 @@ it under the same terms as Perl itself.</P>
       <TH ALIGN="left">Notes<BR></TH>
    </TR>
    <TR>
+      <TH ALIGN="left" VALIGN="top">30-Jun-2003 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.01">1.01</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.01.md5">MD5</A> / 
+         <A HREF="update-nessus-plugins-1.01.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+         <LI>Fixed a glitch that could lead to erroneous information about
+            plugins being reported because comments in scripts were not
+            ignored.</LI>
+      </UL></TD>
+   </TR>
+   <TR>
       <TH ALIGN="left" VALIGN="top">04-Jun-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.00">1.00</A> </TD>
       <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.00.md5">MD5</A> / 
@@ -163,6 +194,15 @@ it under the same terms as Perl itself.</P>
    </TR>
 </TABLE>
 </CENTER>
+
+
+<HR>
+<H4 ALIGN="center">
+   <A HREF="/">TifaWARE</A> |
+   <A HREF="../">Perl Programs</A> | 
+   update-nessus-plugins
+</H4>
+
 
 <!--#include virtual="/footer.html" -->
 <!--#if expr="$weblint" -->
