@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -wT
+#!/usr/bin/perl -wT
 
 
 =head1 NAME
@@ -8,18 +8,18 @@ update-nessus-plugins - Updates Nessus plugins with various options.
 
 =head1 SYNOPSIS
 
-  # Updates nessus plugins. NB: this does nothing more than call
+  # updates nessus plugins. NB: this does nothing more than call
   #   nessus-update-plugins.
   update-nessus-plugins
 
-  # Creates a backup of old plugins and updates plugins.
+  # creates a backup of old plugins and updates plugins.
   update-nessus-plugins -b
 
-  # Creates a backup, updates plugins, and prints a summary of 
+  # creates a backup, updates plugins, and prints a summary of 
   #   new / changed plugins.
   update-nessus-plugins -bs
 
-  # Updates plugins and parses new / changed plugins for errors.
+  # updates plugins and parses new / changed plugins for errors.
   update-nessus-plugins -p
 
 
@@ -40,6 +40,10 @@ commandline arguments:
                                                 plugins first.
     $DEBUG              -d|--debug          Turn on debugging. NB: this
                                                 will still update plugins!
+    @ignores            -i|--ignores        Ignore the specified files found
+                                                in the plugins directory from
+                                                the summary report and parse
+                                                check.
     $lang               -l|--language       Set the language preference used
                                                 to retrieve information for
                                                 summary report from plugins.
@@ -62,13 +66,14 @@ requires the following Perl modules:
     o Digest::MD5
     o File::Find
     o Getopt::Long
+    o IO::Zlib (used by Archive::Tar to output file in compressed form)
     o POSIX
 
 If your system does not have these modules installed already, visit CPAN
-(L<http://search.cpan.org/>) for help.  Note that C<Algorithm::Diff> and
-C<Archive::Tar> are not included with Perl distributions and that
-C<Digest::MD5> is not included with Perl distributions prior to 5.8.0 so
-you may need to install them yourself. 
+(L<http://search.cpan.org/>) for help.  Note that C<Algorithm::Diff>,
+C<Archive::Tar>, and C<IO::Zlib> are not included with Perl
+distributions and that C<Digest::MD5> is not included with Perl
+distributions prior to 5.8.0 so you may need to install them yourself. 
 
 
 =head1 KNOWN BUGS AND CAVEATS
@@ -113,10 +118,10 @@ resolve the problem by yourself.
 Failure to change into the plugin directory, to read a plugin, to create
 a backup, or to run an external command (B<nessus-update-plugins>,
 B<describe-nessus-plugin>, B<nasl>) will be treated as fatal errors and
-reported using C<croak>. 
+reported to stderr using C<croak>. 
 
-Warnings / errors from running B<describe-nessus-plugin> will be reported
-using C<warn>.
+Warnings / errors from running B<describe-nessus-plugin> will be
+reported to stderr using C<warn>. 
 
 
 =head1 SEE ALSO
@@ -133,7 +138,7 @@ George A. Theall, E<lt>theall@tifaware.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2003, George A. Theall.
+Copyright (c) 2003 - 2004, George A. Theall.
 All rights reserved.
 
 This script is free software; you can redistribute it and/or modify
@@ -141,6 +146,15 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+19-Jul-2004, v1.30, George A. Theall
+    o Changed the bang-path to use /usr/bin/perl rather than
+      /usr/local/bin/perl.
+    o Changed the usage message.
+    o Added code to display the usage message if option parsing fails.
+    o Added code to ignore selected files in the plugins directory from
+      the summary report and the parse check along with the associated
+      option C<-i> to specify files from the commandline.
 
 09-Dec-2003, v1.20, George A. Theall
     o Added C<-h> option as a synonym for C<--help>.
@@ -178,8 +192,7 @@ it under the same terms as Perl itself.
 
 ############################################################################
 # Make sure we have access to the required modules.
-require 5;
-
+use 5;
 use strict;
 use Algorithm::Diff qw(diff);
 use Archive::Tar;
@@ -197,6 +210,9 @@ $ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin';    # nb: also passe
 $| = 1;
 my $DEBUG = 0;
 my $backup = 0;                             # retain backup of old plugins?
+my @ignores = (                             # ignore selected files from reports.
+    'MD5',                                  #   - used to verify transfer starting with 2.1.0
+);
 my @info_funcs = (                          # descriptive funcs of interest.
                                             # nb: passed to describe-nessus-plugin
     'bugtraq_id',
@@ -232,16 +248,35 @@ GetOptions(
     'backup|b!',
     'debug|d!',
     'help|h|?!',
+    'ignores|i=s@',
     'language|l=s',
     'parse|p!',
     'summary|s!',
-);
-if ($options{help}) {
-    print "Usage: $0 [-b|--backup] [-d|--debug] [-l|--language \"$lang\"] [-p|--parse] [-s|--summary]\n",
-          "  or\n",
-          "       $0 -h|-?|--help\n";
+) or $options{help} = 1;
+$0 =~ s/^.+\///;
+if ($options{help} or @ARGV) {
+    warn "\n",
+        "Usage: $0 [options]\n",
+        "\n",
+       "Options:\n",
+        "  -?, -h, --help             Display this help and exit.\n",
+        "  -b, --backup               Create a backup of existing plugins first.\n",
+        "  -d, --debug                Display copious debugging messages while\n",
+        "                               running. Note: this will still update\n",
+        "                               the plugins!\n",
+        "  -i, --ignores <files>      Ignore the specified files in the plugins\n",
+        "                               directory from the summary report and\n",
+        "                               the parse check.\n",
+        "  -l, --language <lang>      Use <lang> as the language preference; must be\n",
+        "                               one of 'deutsch', 'english', 'francais', and\n",
+        "                               'portugues'.\n",
+        "  -p, --parse                Parse new / changed plugins and report\n",
+        "                               whether errors exist.\n",
+        "  -s, --summary              Print a summary report of new / changed plugins.\n";
     exit(9);
 }
+@ignores = split(/,\s*/, join(',', @{$options{ignores}}))
+    if ($options{ignores});
 
 chdir $plugins_dir or croak "Can't change directory to '$plugins_dir' - $!\n";
 
@@ -341,6 +376,8 @@ if ($parse or $summary) {
 # Report changes.
 if ($summary) {
     foreach my $plugin (sort keys %new_plugins) {
+        next if (grep($plugin eq $_, @ignores));
+
         # Determine status and skip plugins that weren't updated.
         #
         # nb: nessus-update-plugins doesn't remove plugins.
@@ -430,6 +467,8 @@ if ($summary) {
 if ($parse) {
     my %errors;
     foreach my $plugin (keys %new_plugins) {
+        next if (grep($plugin eq $_, @ignores));
+
         next if (
             exists $old_plugins{$plugin} and 
             ($old_plugins{$plugin} eq $new_plugins{$plugin})
