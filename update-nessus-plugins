@@ -1,4 +1,17 @@
 #!/usr/bin/perl -wT
+#
+# ----------------------------------------------------------------------
+# update-nessus-plugins
+#
+# Written by George A. Theall, theall@tifaware.com
+#
+# Copyright (c) 2004, George A. Theall. All rights reserved.
+#
+# This module is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+# $Id$
+# ---------------------------------------------------------------------
 
 
 =head1 NAME
@@ -129,63 +142,6 @@ reported to stderr using C<warn>.
 L<nessus-update-plugins(5)>,
 L<http://www.tifaware.com/perl/describe-nessus-plugin/>,
 L<http://www.tifaware.com/perl/update-nessus-plugins/>.
-
-
-=head1 AUTHOR
-
-George A. Theall, E<lt>theall@tifaware.comE<gt>
-
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (c) 2003 - 2004, George A. Theall.
-All rights reserved.
-
-This script is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
-
-
-=head1 HISTORY
-
-19-Jul-2004, v1.30, George A. Theall
-    o Changed the bang-path to use /usr/bin/perl rather than
-      /usr/local/bin/perl.
-    o Changed the usage message.
-    o Added code to display the usage message if option parsing fails.
-    o Added code to ignore selected files in the plugins directory from
-      the summary report and the parse check along with the associated
-      option C<-i> to specify files from the commandline.
-
-09-Dec-2003, v1.20, George A. Theall
-    o Added C<-h> option as a synonym for C<--help>.
-    o Added option for selecting preferred language.
-    o Replaced C<print STDERR> with C<warn> throughout the script.
-    o Renamed variable C<$lang_pref> to C<$lang>.
-    o Replaced code used in summary report to parse descriptive 
-      information from a plugin with a call to
-      B<describe-nessus-plugin>.
-    o Removed descriptive info from summary report for any plugins
-      that are include files since the info will always be empty.
-
-12-Oct-2003, v1.11, George A. Theall
-    o Made minor changes in the documentation.
-    o Removed the superfluous variable C<@report>.
-
-10-Oct-2003, v1.10, George A. Theall
-    o Added support for BugTraq IDs and X-References in the summary 
-      report.
-
-03-Sep-2003, v1.02, George A. Theall
-    o Fixed another glitch in reporting plugin information that would
-      arise if comments were not anchored at the start of lines.
-
-30-Jun-2003, v1.01, George A. Theall
-    o Fixed a glitch that could lead to erroneous information about
-      plugins being reported because comments in scripts were not
-      ignored.
-
-04-Jun-2003, v1.00, George A. Theall
-    o Initial version.
 
 =cut
 
