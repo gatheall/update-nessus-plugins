@@ -1,0 +1,171 @@
+<HTML>
+<HEAD>
+<TITLE>update-nessus-plugins</TITLE>
+<LINK REV="made" HREF="mailto:theall@tifaware.com">
+<LINK REL="shortcut icon" HREF="http://www.tifaware.com/favicon.ico">
+</HEAD>
+
+<!--#include virtual="/header.html"-->
+<!--#if expr="$weblint" -->
+<BODY BGCOLOR="#FFFFFF">
+<!--#endif -->
+
+
+<H2>update-nessus-plugins</H2>
+
+<H3>Introduction</H3>
+
+<P><A HREF="http://www.nessus.org/">Nessus</A> is a high-quality and
+free remote vulnerability scanner.  While its initial cost is certainly
+attractive, arguably its main advantage is its extensive and continually
+evolving plugin database of vulnerability checks.  Nessus comes with a
+shell script to retrieve the latest set of plugins from a central
+repository -- <B>nessus-update-plugins</B> -- and I would imagine most
+Nessus users run this fairly often to keep their plugins up-to-date.</P>
+
+<P>While the script does at fine job, it does have a couple of
+limitations, in my opinion: it does not back up existing plugins, it
+doesn't attempt to validate new or changed plugins, and it doesn't
+provide much information on changes.  I designed
+<B>update-nessus-plugins</B> to address these limitations and designed
+it to call <B>nessus-update-plugins</B> to do the actual updates to
+avoid any problem of compatibility.</P>
+
+<P><B>update-nessus-plugins</B> is written in Perl and calls
+<B>nessus-update-plugins</B> to actually update the plugins.  It should work
+on any unix-like system with Perl 5 and a working copy of
+<B>nessus-update-plugins</B>.  It also requires the following modules:</P>
+
+<UL>
+   <LI><CODE>Algorithm::Diff</CODE></LI>
+   <LI><CODE>Archive::Tar</CODE></LI>
+   <LI><CODE>Carp</CODE></LI>
+   <LI><CODE>Digest::MD5</CODE></LI>
+   <LI><CODE>File::Find</CODE></LI>
+   <LI><CODE>Getopt::Long</CODE></LI>
+   <LI><CODE>POSIX</CODE></LI>
+</UL>
+
+<P>If your system does not have these modules installed already, visit
+<A HREF="http://search.cpan.org/">CPAN</A> for help.  Note that
+<CODE>Algorithm::Diff</CODE> and <CODE>Archive::Tar</CODE> are not
+included with the default Perl distribution so you may need to install
+them yourself.</P>
+
+
+<H3>Installation</H3>
+
+<OL>
+   <LI>Retrieve the script 
+      <A HREF="update-nessus-plugins">update-nessus-plugins</A> and save it
+      locally.  You may also wish to verify its 
+      <A HREF="update-nessus-plugins.md5">MD5 checksum</A> or, better, its
+      <A HREF="update-nessus-plugins.asc">GPG signature</A> against
+      <A HREF="/~theall/gpg.html">my current GPG key</A>.</LI>
+   <LI>Verify ownership and permissions on the script - it will need to
+      run as root to run <B>nessus-update-plugins</B>.</LI>
+   <LI>You may wish to edit the script and set <CODE>$lang_pref</CODE> and
+      <CODE>$plugins_dir</CODE> to suit your tastes.</LI>
+</OL>
+
+
+<H3>Use</H3>
+
+<P>There are several commandline arguments you can use to override 
+variables defined in the script itself:</P>
+
+<BLOCKQUOTE>
+<DL>
+   <DT>-b, --backup</DT>
+   <DD>Create a backup of existing plugins first.</DD>
+
+   <DT>-d, --debug</DT>
+   <DD>Display debugging messages while running.  <B>Note: this will
+      still update the plugins!</B></DD>
+
+   <DT>-p, --parse</DT>
+   <DD>Parse new / changed plugins and report whether errors exist.</DD>
+
+   <DT>-s, --summary</DT>
+   <DD>Print a summary report of new / changed plugins.</DD>
+</DL>
+</BLOCKQUOTE>
+
+<P>Notes:</P>
+<UL>
+   <LI>Commandline arguments take precedence over variables defined in the
+      script.</LI>
+
+   <LI>Enabling the debug option will not prevent plugins from being 
+      updated.</LI>
+</UL>
+
+<P>Examples:</P>
+<BLOCKQUOTE>
+<DL>
+   <DT><CODE>update-nessus-plugins</CODE></DT>
+   <DD>updates nessus plugins. Note: this does nothing more than call
+      <B>nessus-update-plugins</B>.</DD>
+
+   <DT><CODE>update-nessus-plugins -b</CODE></DT>
+   <DD>creates a backup of old plugins and updates plugins.</DD>
+
+   <DT><CODE>update-nessus-plugins -bs</CODE></DT>
+   <DD>creates a backup, updates plugins, and prints a summary of 
+      new / changed plugins.</DD>
+
+   <DT><CODE>update-nessus-plugins -p</CODE></DT>
+   <DD>updates plugins and parses new / changed plugins for errors.</DD>
+</DL>
+</BLOCKQUOTE>
+
+
+<H3>Known Bugs and Caveats</H3>
+
+<P>Currently, there is a bug such that comment lines in a plugin 
+script are not ignored when getting information about a plugin
+for the summary.</P>
+
+<P>The option for parsing new / changed plugins requires that the nasl
+interpreter support the <CODE>-p</CODE> option. This is true of the
+version currently in CVS and, I expect, the next stable release of
+Nessus after version 2.0.6a.</P>
+
+
+<H3>Copyright and License</H3>
+
+<P>Copyright (c) 2003, George A. Theall.<BR>
+All rights reserved.</P>
+
+<P>This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</P>
+
+
+<H3>History</H3>
+
+<CENTER>
+<TABLE CELLPADDING="5" CELLSPACING="0" WIDTH="95%" BORDER="1">
+   <TR>
+      <TH ALIGN="left">Date </TH>
+      <TH ALIGN="left">Version </TH>
+      <TH ALIGN="left">Verification </TH>
+      <TH ALIGN="left">Notes<BR></TH>
+   </TR>
+   <TR>
+      <TH ALIGN="left" VALIGN="top">04-Jun-2003 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.00">1.00</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.00.md5">MD5</A> / 
+         <A HREF="update-nessus-plugins-1.00.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+         <LI>Initial version.</LI>
+      </UL></TD>
+   </TR>
+</TABLE>
+</CENTER>
+
+<!--#include virtual="/footer.html" -->
+<!--#if expr="$weblint" -->
+</BODY>
+<!--#endif -->
+</HTML>
