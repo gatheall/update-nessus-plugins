@@ -50,7 +50,7 @@ commandline arguments:
 C<update-nessus-plugins> is written in Perl and calls
 C<nessus-update-plugins> to actually update the plugins.  It should work
 on any unix-like system with Perl 5 and a working copy of
-C<nessus-update-plugins>.  It also requires the following modules:
+C<nessus-update-plugins>.  It also requires the following Perl modules:
 
     o Algorithm::Diff
     o Archive::Tar
@@ -71,7 +71,7 @@ you may need to install them yourself.
 Currently, I am not aware of any bugs in this script. 
 
 The option for parsing new / changed plugins requires that the nasl
-interpreter support the '-p' option, which was introduced with Nessus
+interpreter support the C<-p> option, which was introduced with Nessus
 version 2.0.7. 
 
 You need a working version of C<nessus-update-plugins> to use this
@@ -90,7 +90,8 @@ Fatal errors will be reported using croak.
 
 =head1 SEE ALSO
 
-L<nessus-update-plugins(5)>
+L<nessus-update-plugins(5)>,
+L<http://www.tifaware.com/perl/update-nessus-plugins/>.
 
 
 =head1 AUTHOR
@@ -108,6 +109,10 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+10-Oct-2003, v1.10, George A. Theall
+    o Added support for BugTraq IDs and X-References in the summary 
+      report.
 
 03-Sep-2003, v1.02, George A. Theall
     o Fixed another glitch in reporting plugin information that would
@@ -328,7 +333,7 @@ if ($summary) {
         #     erroneously reported.
         $contents =~ s/#.*\n//mg;
         my %info;
-        for my $var ('id', 'name', 'family', 'category', 'summary', 'version', 'cve_id') {
+        for my $var ('id', 'name', 'family', 'category', 'summary', 'version', 'cve_id', 'bugtraq_id', 'xref') {
             next unless ($contents =~ /script_${var}\s*\((.+?)\);/s);
             my $val = $1;
             print STDERR "debug:   looking at '$var' / '$val'.\n" if $DEBUG;
@@ -351,6 +356,12 @@ if ($summary) {
                 if ($var eq 'category' and exists $categories{$val});
             $val =~ s/^\$Revision: (\S+) \$$/$1/i if ($var eq 'version');
             $val =~ s/\"//g if ($var eq 'cve_id');
+            if ($var eq 'xref' and $val =~ /(name|value)/) {
+                my($name, $value);
+                $name = $1  if ($val =~ /name:\"([^"]+)\"/);
+                $value = $1 if ($val =~ /value:\"([^"]+)\"/);
+                $val = "$name:$value" if ($name and $value);
+            }
 
             $info{$var} = $val;
         }
@@ -360,14 +371,16 @@ if ($summary) {
         # nb: some of the files we're reporting on may be includes
         #     and hence won't have script ids.
         print "$plugin\n",
-              "  Status:     ", $status, "\n",
-              "  Id:         ", ($info{id}       || 'n/a'), "\n",
-              "  Name:       ", ($info{name}     || 'n/a'), "\n",
-              "  Family:     ", ($info{family}   || 'n/a'), "\n",
-              "  Category:   ", ($info{category} || 'n/a'), "\n",
-              "  Summary:    ", ($info{summary}  || 'n/a'), "\n",
-              "  Version:    ", ($info{version}  || 'n/a'), "\n",
-              "  CVE-ID(s):  ", ($info{cve_id}   || 'n/a'), "\n";
+              "  Status:         ", $status, "\n",
+              "  Id:             ", ($info{id}           || 'n/a'), "\n",
+              "  Name:           ", ($info{name}         || 'n/a'), "\n",
+              "  Family:         ", ($info{family}       || 'n/a'), "\n",
+              "  Category:       ", ($info{category}     || 'n/a'), "\n",
+              "  Summary:        ", ($info{summary}      || 'n/a'), "\n",
+              "  Version:        ", ($info{version}      || 'n/a'), "\n",
+              "  CVE-ID(s):      ", ($info{cve_id}       || 'n/a'), "\n",
+              "  BugTraq ID(s):  ", ($info{bugtraq_id}   || 'n/a'), "\n",
+              "  X-Reference:    ", ($info{xref}         || 'n/a'), "\n";
         if ($diffs) {
             print "  Changes:\n";
 
