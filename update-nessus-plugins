@@ -8,27 +8,29 @@ update-nessus-plugins - Updates Nessus plugins with various options.
 
 =head1 SYNOPSIS
 
-  # updates nessus plugins. NB: this does nothing more than call
+  # Updates nessus plugins. NB: this does nothing more than call
   #   nessus-update-plugins.
   update-nessus-plugins
 
-  # creates a backup of old plugins and updates plugins.
+  # Creates a backup of old plugins and updates plugins.
   update-nessus-plugins -b
 
-  # creates a backup, updates plugins, and prints a summary of 
+  # Creates a backup, updates plugins, and prints a summary of 
   #   new / changed plugins.
   update-nessus-plugins -bs
 
-  # updates plugins and parses new / changed plugins for errors.
+  # Updates plugins and parses new / changed plugins for errors.
   update-nessus-plugins -p
 
 
 =head1 DESCRIPTION
 
 This script updates to the latest set of plugins for Nessus and
-optionally creates a backup of existing plugins, prints a summary of
-new / changed plugins, and parses new / changed plugins to check for
-errors.  It calls B<nessus-update-plugins> to do the actual updates.
+optionally creates a backup of existing plugins, prints a summary of new
+/ changed plugins, and parses updated plugins to check for errors.  It
+calls B<nessus-update-plugins> to do the actual updates and
+B<describe-nessus-plugin> to obtain descriptive information about
+updated plugins for the summary report. 
 
 Optional behaviour can be selected using one or more variables or
 commandline arguments:
@@ -38,7 +40,7 @@ commandline arguments:
                                                 plugins first.
     $DEBUG              -d|--debug          Turn on debugging. NB: this
                                                 will still update plugins!
-    $lang_pref          n/a                 Set the language preference used
+    $lang               -l|--language       Set the language preference used
                                                 to retrieve information for
                                                 summary report from plugins.
     $parse              -p|--parse          Parse new / changed plugins
@@ -48,9 +50,11 @@ commandline arguments:
                                                 new / changed plugins.
 
 B<update-nessus-plugins> is written in Perl and calls
-B<nessus-update-plugins> to actually update the plugins.  It should work
-on any unix-like system with Perl 5 and a working copy of
-B<nessus-update-plugins>.  It also requires the following Perl modules:
+B<nessus-update-plugins> to actually update the plugins as well as
+B<describe-nessus-plugin> to obtain descriptive information about new /
+changed plugins.  It should work on any unix-like system with Perl 5 or
+better (Perl 5.005 if you choose to generate summary reports).  It also
+requires the following Perl modules:
 
     o Algorithm::Diff
     o Archive::Tar
@@ -62,7 +66,8 @@ B<nessus-update-plugins>.  It also requires the following Perl modules:
 
 If your system does not have these modules installed already, visit CPAN
 (L<http://search.cpan.org/>) for help.  Note that C<Algorithm::Diff> and
-C<Archive::Tar> are not included with the default Perl distribution so
+C<Archive::Tar> are not included with Perl distributions and that
+C<Digest::MD5> is not included with Perl distributions prior to 5.8.0 so
 you may need to install them yourself. 
 
 
@@ -75,8 +80,13 @@ script.  If you are having trouble getting that to work, please join
 C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
 assistance there.  Note that if you compiled Nessus from source,
 B<nessus-update-plugins> will not be installed unless
-C<nessus-plugins/configure> can find either C<lynx> or C<wget> on your
-system or you invoked it with the option C<--with-fetchcmd=E<lt>cmdE<gt>>.
+C<nessus-plugins/configure> can find either B<curl>, B<links>, B<lynx>,
+or B<wget> on your system or you invoked it with the option
+C<--with-fetchcmd=E<lt>cmdE<gt>>. 
+
+If you wish to generate summary reports of new / changed plugins, you
+also need B<describe-nessus-plugin> version 2.01 or better, which is
+available from L<http://www.tifaware.com/perl/describe-nessus-plugin/>. 
 
 If you encounter an error similar to C<Insecure dependency in chdir
 while running with -T switch at /usr/lib/perl/5.00503/File/Find.pm line
@@ -92,21 +102,27 @@ The option for parsing new / changed plugins requires that the NASL
 interpreter support the C<-p> option, which was introduced with Nessus
 version 2.0.7. 
 
-There is a limit to the size of the arguments passed to
-C<script_cve_id()>, which sets the CVE IDs of the flaws tested by the
-plugin.  Additional CVE IDs, which by convention are listed in comments,
-are not reported by this script since they can not be reliably
-identified. 
+If you encounter a problem with this script, I encourage you to rerun it
+in debug mode (eg, add C<-d> to your commandline) and examine the
+resulting output before contacting me.  Often, this will enable you to
+resolve the problem by yourself. 
 
 
 =head1 DIAGNOSTICS
 
-Fatal errors will be reported using croak.
+Failure to change into the plugin directory, to read a plugin, to create
+a backup, or to run an external command (B<nessus-update-plugins>,
+B<describe-nessus-plugin>, B<nasl>) will be treated as fatal errors and
+reported using C<croak>. 
+
+Warnings / errors from running B<describe-nessus-plugin> will be reported
+using C<warn>.
 
 
 =head1 SEE ALSO
 
 L<nessus-update-plugins(5)>,
+L<http://www.tifaware.com/perl/describe-nessus-plugin/>,
 L<http://www.tifaware.com/perl/update-nessus-plugins/>.
 
 
@@ -125,6 +141,17 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+09-Dec-2003, v1.20, George A. Theall
+    o Added C<-h> option as a synonym for C<--help>.
+    o Added option for selecting preferred language.
+    o Replaced C<print STDERR> with C<warn> throughout the script.
+    o Renamed variable C<$lang_pref> to C<$lang>.
+    o Replaced code used in summary report to parse descriptive 
+      information from a plugin with a call to
+      B<describe-nessus-plugin>.
+    o Removed descriptive info from summary report for any plugins
+      that are include files since the info will always be empty.
 
 12-Oct-2003, v1.11, George A. Theall
     o Made minor changes in the documentation.
@@ -170,19 +197,20 @@ $ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin';    # nb: also passe
 $| = 1;
 my $DEBUG = 0;
 my $backup = 0;                             # retain backup of old plugins?
-my %categories = (                          # map category constants to labels.
-    ACT_ATTACK              => 'attack',
-    ACT_DENIAL              => 'denial',
-    ACT_DESTRUCTIVE_ATTACK  => 'destructive_attack',
-    ACT_END                 => 'unknown',
-    ACT_GATHER_INFO         => 'infos',
-    ACT_KILL_HOST           => 'kill_host',
-    ACT_MIXED_ATTACK        => 'mixed',
-    ACT_SCANNER             => 'scanner',
-    ACT_SETTINGS            => 'settings',
+my @info_funcs = (                          # descriptive funcs of interest.
+                                            # nb: passed to describe-nessus-plugin
+    'bugtraq_id',
+    'category',
+    'cve_id',
+    'family',
+    'id',
+    'name',
+    'risk',
+    'summary',
+    'version',
+    'xref',
 );
-my $lang_pref = 'english';                  # language pref for plugin summary;
-                                            #   eg, 'english' or 'francais'.
+my $lang = 'english';       # 'deutsch', 'english', 'francais', or 'portugues'
 my $parse = 0;                              # parse new / changed plugins?
 my $plugins_dir = '/usr/local/lib/nessus/plugins';  # where plugins are stored.
 my $scratch_dir = '/tmp';                   # where archive is stored.
@@ -194,6 +222,7 @@ my $summary = 0;                            # summarize changes to plugins?
 my %options = (
     'backup'   => \$backup,
     'debug'    => \$DEBUG,
+    'language' => \$lang,
     'parse'    => \$parse,
     'summary'  => \$summary,
 );
@@ -202,12 +231,15 @@ GetOptions(
     \%options,
     'backup|b!',
     'debug|d!',
-    'help|?!',
+    'help|h|?!',
+    'language|l=s',
     'parse|p!',
     'summary|s!',
 );
 if ($options{help}) {
-    print "Usage: $0 [-b|--backup] [-d|--debug] [-p|--parse] [-s|--summary]\n";
+    print "Usage: $0 [-b|--backup] [-d|--debug] [-l|--language \"$lang\"] [-p|--parse] [-s|--summary]\n",
+          "  or\n",
+          "       $0 -h|-?|--help\n";
     exit(9);
 }
 
@@ -218,11 +250,11 @@ chdir $plugins_dir or croak "Can't change directory to '$plugins_dir' - $!\n";
 # Take a snapshot of plugins directory.
 my %old_plugins;
 if ($backup or $parse or $summary) {
-    print STDERR "debug: files in '$plugins_dir' before update:\n" if $DEBUG;
+    warn "debug: files in '$plugins_dir' before update:\n" if $DEBUG;
     find(
         { wanted => sub {
                 if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and /^\.\/(.+)$/) {
-                    print STDERR "debug:   $1\n" if $DEBUG;
+                    warn "debug:   $1\n" if $DEBUG;
                     $old_plugins{$1}++;
                 }
             },
@@ -235,13 +267,13 @@ if ($backup or $parse or $summary) {
 
 if ($parse or $summary) {
     # Compute hashes for plugins so we can detect changes.
-    print STDERR "debug: computing hashes for plugins:\n" if $DEBUG;
+    warn "debug: computing hashes for plugins:\n" if $DEBUG;
     foreach my $file (sort keys %old_plugins) {
         open(FILE, $file) or croak "Can't open '$file' - $!\n";
         binmode(FILE);
         my $md5 = Digest::MD5->new->addfile(*FILE)->hexdigest;
         close(FILE);
-        print STDERR "debug:   $file -> $md5\n" if $DEBUG;
+        warn "debug:   $file -> $md5\n" if $DEBUG;
         $old_plugins{$file} = $md5;
     }
 }
@@ -251,7 +283,7 @@ if ($parse or $summary) {
 # Create backup.
 my($archive, $tar);
 if ($backup or $summary) {
-    print STDERR "debug: generating backup of files in '$plugins_dir'.\n" if $DEBUG;
+    warn "debug: generating backup of files in '$plugins_dir'.\n" if $DEBUG;
     $archive = "$scratch_dir/plugins-pre-" . 
         strftime("%Y%m%d-%H%M%S", localtime) .
         ".tar.gz";
@@ -267,7 +299,7 @@ if ($backup or $summary) {
 
 ############################################################################
 # Update plugins.
-print STDERR "debug: updating plugins.\n" if $DEBUG;
+warn "debug: updating plugins.\n" if $DEBUG;
 my $cmd = 'nessus-update-plugins';
 system $cmd;
 my $rc = $? >> 8;
@@ -278,11 +310,11 @@ croak "Can't retrieve plugins ($rc)!\n" if ($rc);
 # Take a second snapshot of plugins directory.
 my %new_plugins;
 if ($parse or $summary) {
-    print STDERR "debug: files in '$plugins_dir' after update:\n" if $DEBUG;
+    warn "debug: files in '$plugins_dir' after update:\n" if $DEBUG;
     find(
         { wanted => sub {
                 if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and /^\.\/(.+)$/) {
-                    print STDERR "debug:   $1\n" if $DEBUG;
+                    warn "debug:   $1\n" if $DEBUG;
                     $new_plugins{$1}++;
                 }
             },
@@ -293,13 +325,13 @@ if ($parse or $summary) {
     );
 
     # Compute hashes anew.
-    print STDERR "debug: computing hashes for plugins:\n" if $DEBUG;
+    warn "debug: computing hashes for plugins:\n" if $DEBUG;
     foreach my $file (sort keys %new_plugins) {
         open(FILE, $file) or croak "Can't open '$file' - $!\n";
         binmode(FILE);
         my $md5 = Digest::MD5->new->addfile(*FILE)->hexdigest;
         close(FILE);
-        print STDERR "debug:   $file -> $md5\n" if $DEBUG;
+        warn "debug:   $file -> $md5\n" if $DEBUG;
         $new_plugins{$file} = $md5;
     }
 }
@@ -323,83 +355,58 @@ if ($summary) {
             $status = 'added';
         }
 
-        # Read new plugin.
+        # Get descriptive info about plugin.
         #
         # nb: we've already chdir'd into $plugin_dir.
-        print STDERR "debug: reading contents of '$plugin'.\n" if $DEBUG;
-        open(FILE, $plugin) or croak "Can't read $plugin - $!\n";
-        my $contents;
-        { local $/; $contents = <FILE>; }
-        close(FILE);
+        my($indent, @info);
+        if ($plugin =~ /\.nasl$/) {
+            my $cmd = 'describe-nessus-plugin ' . 
+                '-f ' . join(',', @info_funcs) . ' ' .
+                "-l $lang " .
+                $plugin;
+            open(CMD, "$cmd 2>&1 |") or croak "Can't run '$cmd' - $!\n";
+            while (<CMD>) {
+                chomp;
+                warn "$_\n" if (/^\*{3} /); # nb: display any warnings / errors.
+                next unless (/^\s/);
+                $indent = length($1) - 4 if (!$indent and /^(.+?:\s*)/);
+                push(@info, $_);
+            }
+            close(CMD);
+            my $rc = $? >> 8;
+            if ($rc or !$indent) {
+                warn "*** Can't get descriptive info for '$plugin' (rc=$rc)! ***\n";
+            }
+        }
+        # nb: include files don't have a descriptive part.
+        elsif ($plugin !~ /\.inc$/) {
+            warn "*** '$plugin' has an unsupported plugin type! ***\n";
+        }
+        $indent = 15 unless ($indent);
 
         # If plugin was changed, compute diffs.
         my $diffs;
         if ($status eq 'changed') {
-            print STDERR "debug:   computing diffs.\n" if $DEBUG;
+            warn "debug:   computing diffs.\n" if $DEBUG;
             my @old = split(/\n/, $tar->get_content($plugin));
 
             my @new;
-            open(NEW, $plugin) or croak "Can't read from '$plugin' - $!\n";
+            open(NEW, $plugin) or croak "Can't read '$plugin' - $!\n";
             chomp(@new = <NEW>);
             close(NEW);
 
             $diffs = diff(\@old, \@new);
         }
 
-        # Get info about the new plugin.
-        #
-        # nb: remove comment lines so any info they might hold is not 
-        #     erroneously reported.
-        $contents =~ s/#.*\n//mg;
-        my %info;
-        for my $var ('id', 'name', 'family', 'category', 'summary', 'version', 'cve_id', 'bugtraq_id', 'xref') {
-            next unless ($contents =~ /script_${var}\s*\((.+?)\);/s);
-            my $val = $1;
-            print STDERR "debug:   looking at '$var' / '$val'.\n" if $DEBUG;
-
-            # nb: fall back to english if content in the specified language
-            #     preference is not available.
-            $val = $1 if ($val =~ /$lang_pref:\s*\"(.+?)\"/ or $val =~ /english:\s*\"(.+?)\"/);
-            if ($val =~ /(${lang_pref}):\s*(\w+)\[\"${lang_pref}\"\]/i or $val =~ /(english):\s*(\w+)\[\"english\"\]/i) {
-                my $lang_pref = $1;
-                my $var = $2;
-                if ($contents =~ /$var\[\"$lang_pref\"\]\s*=\s*(.+?);/) {
-                    $val = $1;
-                }
-                else {
-                    $val = 'n/a';
-                }
-            }
-            $val =~ s/^\s*"\s*(.+)\s*"\s*$/$1/;
-            $val = $categories{$val}
-                if ($var eq 'category' and exists $categories{$val});
-            $val =~ s/^\$Revision: (\S+) \$$/$1/i if ($var eq 'version');
-            $val =~ s/\"//g if ($var eq 'cve_id');
-            if ($var eq 'xref' and $val =~ /(name|value)/) {
-                my($name, $value);
-                $name = $1  if ($val =~ /name:\"([^"]+)\"/);
-                $value = $1 if ($val =~ /value:\"([^"]+)\"/);
-                $val = "$name:$value" if ($name and $value);
-            }
-
-            $info{$var} = $val;
-        }
-
         # Print report.
         #
         # nb: some of the files we're reporting on may be includes
         #     and hence won't have script ids.
-        print "$plugin\n",
-              "  Status:         ", $status, "\n",
-              "  Id:             ", ($info{id}           || 'n/a'), "\n",
-              "  Name:           ", ($info{name}         || 'n/a'), "\n",
-              "  Family:         ", ($info{family}       || 'n/a'), "\n",
-              "  Category:       ", ($info{category}     || 'n/a'), "\n",
-              "  Summary:        ", ($info{summary}      || 'n/a'), "\n",
-              "  Version:        ", ($info{version}      || 'n/a'), "\n",
-              "  CVE-ID(s):      ", ($info{cve_id}       || 'n/a'), "\n",
-              "  BugTraq ID(s):  ", ($info{bugtraq_id}   || 'n/a'), "\n",
-              "  X-Reference:    ", ($info{xref}         || 'n/a'), "\n";
+        print "$plugin\n";
+        printf "  %-${indent}s  %s\n", "Status:", $status;
+        foreach (@info) {
+            print "$_\n";
+        }
         if ($diffs) {
             print "  Changes:\n";
 
@@ -431,12 +438,12 @@ if ($parse) {
             warn "*** unsure if '$plugin' is a NASL script; skipped! ***\n";
             next;
         }
-        print STDERR "debug: parsing '$plugin'.\n" if $DEBUG;
+        warn "debug: parsing '$plugin'.\n" if $DEBUG;
 
         my $cmd = "nasl -p $plugin";
         open(CMD, "$cmd 2>&1 |") or croak "Can't run '$cmd' - $!\n";
         while (<CMD>) {
-            print STDERR "debug:   >>$_<<.\n" if $DEBUG;
+            warn "debug:   >>$_<<.\n" if $DEBUG;
             $errors{$plugin} .= $_;
         }
         close(CMD);
