@@ -13,11 +13,11 @@
 
 <H4 ALIGN="center">
    <A HREF="/">TifaWARE</A> |
-   <A HREF="../">Perl Programs</A> | 
+   <A HREF="../">Perl Programs</A> |
    update-nessus-plugins
 </H4>
-
-
+                                                                                
+                                                                                
 <HR>
 <H2>update-nessus-plugins</H2>
 
@@ -137,9 +137,8 @@ script are not ignored when getting information about a plugin
 for the summary.</P>
 
 <P>The option for parsing new / changed plugins requires that the nasl
-interpreter support the <CODE>-p</CODE> option. This is true of the
-version currently in CVS and, I expect, the next stable release of
-Nessus after version 2.0.6a.</P>
+interpreter support the <CODE>-p</CODE> option, which was introduced
+with Nessus version 2.0.7.</P>
 
 <P>You need a working version of <CODE>nessus-update-plugins</CODE> to
 use this script.  If you are having trouble getting that to work, please
@@ -171,6 +170,17 @@ it under the same terms as Perl itself.</P>
       <TH ALIGN="left">Notes<BR></TH>
    </TR>
    <TR>
+      <TH ALIGN="left" VALIGN="top">03-Sep-2003 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.02">1.02</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.02.md5">MD5</A> / 
+         <A HREF="update-nessus-plugins-1.02.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+         <LI>Fixed another glitch in reporting plugin information that would
+            arise if comments were not anchored at the start of lines.</LI>
+      </UL></TD>
+   </TR>
+   <TR>
       <TH ALIGN="left" VALIGN="top">30-Jun-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.01">1.01</A> </TD>
       <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.01.md5">MD5</A> / 
@@ -199,11 +209,11 @@ it under the same terms as Perl itself.</P>
 <HR>
 <H4 ALIGN="center">
    <A HREF="/">TifaWARE</A> |
-   <A HREF="../">Perl Programs</A> | 
+   <A HREF="../">Perl Programs</A> |
    update-nessus-plugins
 </H4>
-
-
+                                                                                
+                                                                                
 <!--#include virtual="/footer.html" -->
 <!--#if expr="$weblint" -->
 </BODY>

@@ -71,9 +71,8 @@ you may need to install them yourself.
 Currently, I am not aware of any bugs in this script. 
 
 The option for parsing new / changed plugins requires that the nasl
-interpreter support the '-p' option.  This is true of the version
-currently in CVS and, I expect, the next stable release of Nessus after
-version 2.0.6a. 
+interpreter support the '-p' option, which was introduced with Nessus
+version 2.0.7. 
 
 You need a working version of C<nessus-update-plugins> to use this
 script.  If you are having trouble getting that to work, please join
@@ -109,6 +108,10 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+03-Sep-2003, v1.02, George A. Theall
+    o Fixed another glitch in reporting plugin information that would
+      arise if comments were not anchored at the start of lines.
 
 30-Jun-2003, v1.01, George A. Theall
     o Fixed a glitch that could lead to erroneous information about
@@ -323,7 +326,7 @@ if ($summary) {
         #
         # nb: remove comment lines so any info they might hold is not 
         #     erroneously reported.
-        $contents =~ s/^#.*\n//mg;
+        $contents =~ s/#.*\n//mg;
         my %info;
         for my $var ('id', 'name', 'family', 'category', 'summary', 'version', 'cve_id') {
             next unless ($contents =~ /script_${var}\s*\((.+?)\);/s);
