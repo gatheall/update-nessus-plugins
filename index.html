@@ -36,9 +36,9 @@ up-to-date.</P>
 limitations, in my opinion: it does not back up existing plugins, it
 doesn't attempt to validate new or changed plugins, and it doesn't
 provide much information on changes.  I designed
-<B>update-nessus-plugins</B> to address these limitations and designed
-it to call <CODE>nessus-update-plugins</CODE> to do the actual updates
-to avoid any problem of compatibility.</P>
+<B>update-nessus-plugins</B> to address these limitations and to call
+<CODE>nessus-update-plugins</CODE> to do the actual updates so as to
+avoid any problem of compatibility.</P>
 
 <P><B>update-nessus-plugins</B> is written in Perl and calls
 <CODE>nessus-update-plugins</CODE> to actually update the plugins.  It
@@ -74,8 +74,10 @@ them yourself.</P>
       <A HREF="/~theall/gpg.html">my current GPG key</A>.</LI>
    <LI>Verify ownership and permissions on the script - it will need to
       run as root to run <CODE>nessus-update-plugins</CODE>.</LI>
-   <LI>You may wish to edit the script and set <CODE>$lang_pref</CODE> and
-      <CODE>$plugins_dir</CODE> to suit your tastes.</LI>
+   <LI>You may wish to edit the script to adjust the location of
+      the perl interpreter in the first line and to set 
+      <CODE>$lang_pref</CODE> as well as <CODE>$plugins_dir</CODE> to 
+      suit your tastes.</LI>
 </OL>
 
 
@@ -132,22 +134,38 @@ variables defined in the script itself:</P>
 
 <H3>Known Bugs and Caveats</H3>
 
-<P>Currently, there is a bug such that comment lines in a plugin 
-script are not ignored when getting information about a plugin
-for the summary.</P>
-
-<P>The option for parsing new / changed plugins requires that the nasl
-interpreter support the <CODE>-p</CODE> option, which was introduced
-with Nessus version 2.0.7.</P>
+<P>There is a bug in the script that ignores all but the first X-Reference
+in a plugin when printing a summary report. I hope to fix this shortly.</P>
 
 <P>You need a working version of <CODE>nessus-update-plugins</CODE> to
 use this script.  If you are having trouble getting that to work, please
 join <A HREF="http://list.nessus.org/">nessus@list.nessus.org</A> and
-ask for assistance there.  Note that, if you compiled Nessus from
-source, <CODE>nessus-update-plugins</CODE> will not be installed unless
+ask for assistance there.  Note that if you compiled Nessus from source,
+<CODE>nessus-update-plugins</CODE> will not be installed unless
 <CODE>nessus-plugins/configure</CODE> can find either <CODE>lynx</CODE>
 or <CODE>wget</CODE> on your system or you invoked it with the option
 <CODE>--with-fetchcmd=&lt;cmd&gt;</CODE>.</P>
+
+<P>If you encounter an error similar to <CODE>Insecure dependency in
+chdir while running with -T switch at /usr/lib/perl/5.00503/File/Find.pm
+line 133</CODE> when trying to run <B>update-nessus-plugins</B>, it's
+likely that you're using an older version of the Perl module
+<CODE>File::Find</CODE>.  Versions distributed with Perl versions prior
+to 5.6.0 don't support the <CODE>no_chdir</CODE> option, which is used
+in this script to avoid problems with taint checks.  The solution is to
+either upgrade <CODE>File::Find</CODE>, upgrade Perl itself, or disable
+taint checks (ie, remove the <CODE>-T</CODE> option on the first line of
+the script).</P>
+
+<P>The option for parsing new / changed plugins requires that the NASL
+interpreter support the <CODE>-p</CODE> option, which was introduced
+with Nessus version 2.0.7.</P>
+
+<P>There is a limit to the size of the arguments passed to
+<CODE>script_cve_id()</CODE>, which sets the CVE IDs of the flaws tested
+by the plugin.  Additional CVE IDs, which by convention are listed in
+comments, are not reported by this script since they can not be reliably
+identified.</P>
 
 
 <H3>Copyright and License</H3>
@@ -168,6 +186,17 @@ it under the same terms as Perl itself.</P>
       <TH ALIGN="left">Version </TH>
       <TH ALIGN="left">Verification </TH>
       <TH ALIGN="left">Notes<BR></TH>
+   </TR>
+   <TR>
+      <TH ALIGN="left" VALIGN="top">12-Oct-2003 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.11">1.11</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="update-nessus-plugins-1.11.md5">MD5</A> / 
+         <A HREF="update-nessus-plugins-1.11.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+         <LI>Made minor changes in the documentation.</LI>
+         <LI>Removed the superfluous variable <CODE>@report</CODE>.</LI>
+      </UL></TD>
    </TR>
    <TR>
       <TH ALIGN="left" VALIGN="top">10-Oct-2003 </TH>

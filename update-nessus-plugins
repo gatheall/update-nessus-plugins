@@ -28,7 +28,7 @@ update-nessus-plugins - Updates Nessus plugins with various options.
 This script updates to the latest set of plugins for Nessus and
 optionally creates a backup of existing plugins, prints a summary of
 new / changed plugins, and parses new / changed plugins to check for
-errors.  It calls C<nessus-update-plugins> to do the actual updates.
+errors.  It calls B<nessus-update-plugins> to do the actual updates.
 
 Optional behaviour can be selected using one or more variables or
 commandline arguments:
@@ -47,10 +47,10 @@ commandline arguments:
     $summary            -s|--summary        Print a summary report of 
                                                 new / changed plugins.
 
-C<update-nessus-plugins> is written in Perl and calls
-C<nessus-update-plugins> to actually update the plugins.  It should work
+B<update-nessus-plugins> is written in Perl and calls
+B<nessus-update-plugins> to actually update the plugins.  It should work
 on any unix-like system with Perl 5 and a working copy of
-C<nessus-update-plugins>.  It also requires the following Perl modules:
+B<nessus-update-plugins>.  It also requires the following Perl modules:
 
     o Algorithm::Diff
     o Archive::Tar
@@ -70,17 +70,33 @@ you may need to install them yourself.
 
 Currently, I am not aware of any bugs in this script. 
 
-The option for parsing new / changed plugins requires that the nasl
+You need a working version of B<nessus-update-plugins> to use this
+script.  If you are having trouble getting that to work, please join
+C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
+assistance there.  Note that if you compiled Nessus from source,
+B<nessus-update-plugins> will not be installed unless
+C<nessus-plugins/configure> can find either C<lynx> or C<wget> on your
+system or you invoked it with the option C<--with-fetchcmd=E<lt>cmdE<gt>>.
+
+If you encounter an error similar to C<Insecure dependency in chdir
+while running with -T switch at /usr/lib/perl/5.00503/File/Find.pm line
+133> when trying to run B<update-nessus-plugins>, it's likely that
+you're using an older version of the Perl module C<File::Find>. 
+Versions distributed with Perl versions prior to 5.6.0 don't support the
+C<no_chdir> option, which is used in this script to avoid problems with
+taint checks.  The solution is to either upgrade C<File::Find>, upgrade
+Perl itself, or disable taint checks (ie, remove the C<-T> option on the
+first line of the script). 
+
+The option for parsing new / changed plugins requires that the NASL
 interpreter support the C<-p> option, which was introduced with Nessus
 version 2.0.7. 
 
-You need a working version of C<nessus-update-plugins> to use this
-script.  If you are having trouble getting that to work, please join
-C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
-assistance there.  Note that, if you compiled Nessus from source,
-C<nessus-update-plugins> will not be installed unless
-C<nessus-plugins/configure> can find either C<lynx> or C<wget> on your
-system or you invoked it with the option C<--with-fetchcmd=&lt;cmd&gt;>. 
+There is a limit to the size of the arguments passed to
+C<script_cve_id()>, which sets the CVE IDs of the flaws tested by the
+plugin.  Additional CVE IDs, which by convention are listed in comments,
+are not reported by this script since they can not be reliably
+identified. 
 
 
 =head1 DIAGNOSTICS
@@ -109,6 +125,10 @@ it under the same terms as Perl itself.
 
 
 =head1 HISTORY
+
+12-Oct-2003, v1.11, George A. Theall
+    o Made minor changes in the documentation.
+    o Removed the superfluous variable C<@report>.
 
 10-Oct-2003, v1.10, George A. Theall
     o Added support for BugTraq IDs and X-References in the summary 
@@ -307,7 +327,6 @@ if ($summary) {
         #
         # nb: we've already chdir'd into $plugin_dir.
         print STDERR "debug: reading contents of '$plugin'.\n" if $DEBUG;
-        my @report;
         open(FILE, $plugin) or croak "Can't read $plugin - $!\n";
         my $contents;
         { local $/; $contents = <FILE>; }
