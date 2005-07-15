@@ -96,11 +96,7 @@ Currently, I am not aware of any bugs in this script.
 You need a working version of B<nessus-update-plugins> to use this
 script.  If you are having trouble getting that to work, please join
 C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
-assistance there.  Note that if you compiled Nessus from source,
-B<nessus-update-plugins> will not be installed unless
-C<nessus-plugins/configure> can find either B<curl>, B<links>, B<lynx>,
-or B<wget> on your system or you invoked it with the option
-C<--with-fetchcmd=E<lt>cmdE<gt>>. 
+assistance there. 
 
 If you wish to generate summary reports of new / changed plugins, you
 also need B<describe-nessus-plugin> version 2.01 or better, which is
