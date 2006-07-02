@@ -5,7 +5,7 @@
 #
 # Written by George A. Theall, theall@tifaware.com
 #
-# Copyright (c) 2004, George A. Theall. All rights reserved.
+# Copyright (c) 2004-2006, George A. Theall. All rights reserved.
 #
 # This module is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -158,7 +158,7 @@ use POSIX qw(strftime);
 ############################################################################
 # Initialize variables.
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};   # Make %ENV safer
-$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin';    # nb: also passed to nessus-update-plugins
+$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/opt/nessus/bin';    # nb: also passed to nessus-update-plugins
 $| = 1;
 my $DEBUG = 0;
 my $backup = 0;                             # retain backup of old plugins?
@@ -375,7 +375,7 @@ if ($summary) {
 
         # If plugin was changed, compute diffs.
         my $diffs;
-        if ($status eq 'changed') {
+        if ($status eq 'changed' and $plugin =~ /\.(inc|nasl)$) {
             warn "debug:   computing diffs.\n" if $DEBUG;
             my @old = split(/\n/, $tar->get_content($plugin));
 
