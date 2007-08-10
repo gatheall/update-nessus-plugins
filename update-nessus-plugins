@@ -367,8 +367,8 @@ if ($summary) {
                 warn "*** Can't get descriptive info for '$plugin' (rc=$rc)! ***\n";
             }
         }
-        # nb: include files don't have a descriptive part.
-        elsif ($plugin !~ /\.inc$/) {
+        # nb: some files don't have a descriptive part.
+        elsif ($plugin !~ /\.(inc|nbin)$/) {
             warn "*** '$plugin' has an unsupported plugin type! ***\n";
         }
         $indent = 15 unless ($indent);
@@ -425,6 +425,9 @@ if ($parse) {
             exists $old_plugins{$plugin} and 
             ($old_plugins{$plugin} eq $new_plugins{$plugin})
         );
+        if ($plugin =~ /\.nbin$/) {
+            next;
+        }
         unless ($plugin =~ /\.(inc|nasl)$/) {
             warn "*** unsure if '$plugin' is a NASL script; skipped! ***\n";
             next;
