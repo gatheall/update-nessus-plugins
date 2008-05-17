@@ -375,7 +375,7 @@ if ($summary) {
 
         # If plugin was changed, compute diffs.
         my $diffs;
-        if ($status eq 'changed' and $plugin =~ /\.(inc|nasl)$/) {
+        if ($status eq 'changed' and $plugin =~ /\.(inc|nasl)$/ and -T $plugin) {
             warn "debug:   computing diffs.\n" if $DEBUG;
             my @old = split(/\n/, $tar->get_content($plugin));
 
