@@ -425,7 +425,7 @@ if ($parse) {
             exists $old_plugins{$plugin} and 
             ($old_plugins{$plugin} eq $new_plugins{$plugin})
         );
-        if ($plugin =~ /\.nbin$/) {
+        if ($plugin =~ /\.nbin$/ or -B $plugin) {
             next;
         }
         unless ($plugin =~ /\.(inc|nasl)$/) {
