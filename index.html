@@ -106,10 +106,6 @@ variables defined in the script itself:</P>
    <DD>Ignore the specified files found in the plugins directory from
       the summary report and parse check, overriding <CODE>@ignores</CODE>.</DD>
 
-   <DT>-l, --language</DT>
-   <DD>Select language preference for descriptive information, overriding
-      <CODE>$lang</CODE>. This is passed to <B>describe-nessus-plugin</B>.</DD>
-
    <DT>-p, --parse</DT>
    <DD>Parse new / changed plugins and report whether errors exist.</DD>
 
@@ -211,6 +207,19 @@ it under the same terms as Perl itself.</P>
       <TH ALIGN="left">Version </TH>
       <TH ALIGN="left">Verification </TH>
       <TH ALIGN="left">Notes<BR></TH>
+   </TR>
+   <TR>
+      <TH ALIGN="left" VALIGN="top">14-Dec-2008 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36">1.36</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36.md5">MD5</A> / 
+         <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+        <LI>Removed support for setting language since it's obsolete in Nessus.</LI>
+        <LI>Ignore .bootstrap.done in plugins directory.</LI>
+        <LI>Explicitly ignore nlib's.</LI>
+        <LI>Don't croak if a plugin doesn't exist.</LI>
+      </UL></TD>
    </TR>
    <TR>
       <TH ALIGN="left" VALIGN="top">27-May-2008 </TH>
