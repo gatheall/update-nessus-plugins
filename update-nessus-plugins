@@ -57,9 +57,6 @@ commandline arguments:
                                                 in the plugins directory from
                                                 the summary report and parse
                                                 check.
-    $lang               -l|--language       Set the language preference used
-                                                to retrieve information for
-                                                summary report from plugins.
     $parse              -p|--parse          Parse new / changed plugins
                                                 and report whether errors
                                                 exist.
@@ -158,7 +155,7 @@ use POSIX qw(strftime);
 ############################################################################
 # Initialize variables.
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};   # Make %ENV safer
-$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/opt/nessus/bin';    # nb: also passed to nessus-update-plugins
+$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/opt/nessus/bin:/opt/nessus/sbin';    # nb: also passed to nessus-update-plugins
 $| = 1;
 my $DEBUG = 0;
 my $backup = 0;                             # retain backup of old plugins?
@@ -178,7 +175,6 @@ my @info_funcs = (                          # descriptive funcs of interest.
     'version',
     'xref',
 );
-my $lang = 'english';       # 'deutsch', 'english', 'francais', or 'portugues'
 my $parse = 0;                              # parse new / changed plugins?
 my $plugins_dir = '/usr/local/lib/nessus/plugins';  # where plugins are stored.
 my $scratch_dir = '/tmp';                   # where archive is stored.
@@ -190,7 +186,6 @@ my $summary = 0;                            # summarize changes to plugins?
 my %options = (
     'backup'   => \$backup,
     'debug'    => \$DEBUG,
-    'language' => \$lang,
     'parse'    => \$parse,
     'summary'  => \$summary,
 );
@@ -201,7 +196,6 @@ GetOptions(
     'debug|d!',
     'help|h|?!',
     'ignores|i=s@',
-    'language|l=s',
     'parse|p!',
     'summary|s!',
 ) or $options{help} = 1;
@@ -219,9 +213,6 @@ if ($options{help} or @ARGV) {
         "  -i, --ignores <files>      Ignore the specified files in the plugins\n",
         "                               directory from the summary report and\n",
         "                               the parse check.\n",
-        "  -l, --language <lang>      Use <lang> as the language preference; must be\n",
-        "                               one of 'deutsch', 'english', 'francais', and\n",
-        "                               'portugues'.\n",
         "  -p, --parse                Parse new / changed plugins and report\n",
         "                               whether errors exist.\n",
         "  -s, --summary              Print a summary report of new / changed plugins.\n";
@@ -240,7 +231,7 @@ if ($backup or $parse or $summary) {
     warn "debug: files in '$plugins_dir' before update:\n" if $DEBUG;
     find(
         { wanted => sub {
-                if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and /^\.\/(.+)$/) {
+                if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and !/^\.\/\.bootstrap\.done$/ and /^\.\/(.+)$/) {
                     warn "debug:   $1\n" if $DEBUG;
                     $old_plugins{$1}++;
                 }
@@ -300,7 +291,7 @@ if ($parse or $summary) {
     warn "debug: files in '$plugins_dir' after update:\n" if $DEBUG;
     find(
         { wanted => sub {
-                if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and /^\.\/(.+)$/) {
+                if ($File::Find::dir eq '.' and !/^\.\/\.desc/ and !/^\.\/\.bootstrap\.done$/ and /^\.\/(.+)$/) {
                     warn "debug:   $1\n" if $DEBUG;
                     $new_plugins{$1}++;
                 }
@@ -314,6 +305,8 @@ if ($parse or $summary) {
     # Compute hashes anew.
     warn "debug: computing hashes for plugins:\n" if $DEBUG;
     foreach my $file (sort keys %new_plugins) {
+        next if (! -f $file);
+
         open(FILE, $file) or croak "Can't open '$file' - $!\n";
         binmode(FILE);
         my $md5 = Digest::MD5->new->addfile(*FILE)->hexdigest;
@@ -329,6 +322,7 @@ if ($parse or $summary) {
 if ($summary) {
     foreach my $plugin (sort keys %new_plugins) {
         next if (grep($plugin eq $_, @ignores));
+        next unless (-f $plugin);
 
         # Determine status and skip plugins that weren't updated.
         #
@@ -351,7 +345,6 @@ if ($summary) {
         if ($plugin =~ /\.nasl$/) {
             my $cmd = 'describe-nessus-plugin ' . 
                 '-f ' . join(',', @info_funcs) . ' ' .
-                "-l $lang " .
                 $plugin;
             open(CMD, "$cmd 2>&1 |") or croak "Can't run '$cmd' - $!\n";
             while (<CMD>) {
@@ -368,7 +361,7 @@ if ($summary) {
             }
         }
         # nb: some files don't have a descriptive part.
-        elsif ($plugin !~ /\.(inc|nbin)$/) {
+        elsif ($plugin !~ /\.(inc|nbin|nlib)$/) {
             warn "*** '$plugin' has an unsupported plugin type! ***\n";
         }
         $indent = 15 unless ($indent);
@@ -425,7 +418,8 @@ if ($parse) {
             exists $old_plugins{$plugin} and 
             ($old_plugins{$plugin} eq $new_plugins{$plugin})
         );
-        if ($plugin =~ /\.nbin$/ or -B $plugin) {
+        next unless (-f $plugin);
+        if ($plugin =~ /\.(nbin|nlib)$/ or -B $plugin) {
             next;
         }
         unless ($plugin =~ /\.(inc|nasl)$/) {
