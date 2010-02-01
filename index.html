@@ -51,7 +51,7 @@ modules:</P>
    <LI><CODE>Algorithm::Diff</CODE></LI>
    <LI><CODE>Archive::Tar</CODE></LI>
    <LI><CODE>Carp</CODE></LI>
-   <LI><CODE>Digest::MD5</CODE></LI>
+   <LI><CODE>Digest::SHA</CODE></LI>
    <LI><CODE>File::Find</CODE></LI>
    <LI><CODE>Getopt::Long</CODE></LI>
    <LI><CODE>IO::Zlib</CODE> (used by <CODE>Archive::Tar</CODE> to output file 
@@ -63,7 +63,7 @@ modules:</P>
 <A HREF="http://search.cpan.org/">CPAN</A> for help.  Note that
 <CODE>Algorithm::Diff</CODE>, <CODE>Archive::Tar</CODE>, and
 <CODE>IO::Zlib</CODE> are not included with Perl distributions and that
-<CODE>Digest::MD5</CODE> is not included with Perl distributions prior
+<CODE>Digest::SHA</CODE> is not included with Perl distributions prior
 to 5.8.0 so you may need to install them yourself.</P>
 
 
@@ -73,7 +73,7 @@ to 5.8.0 so you may need to install them yourself.</P>
    <LI>Retrieve the script 
       <A HREF="/code/update-nessus-plugins/update-nessus-plugins">update-nessus-plugins</A> and save it
       locally.  You may also wish to verify its 
-      <A HREF="/code/update-nessus-plugins/update-nessus-plugins.md5">MD5 checksum</A> or, better, its
+      <A HREF="/code/update-nessus-plugins/update-nessus-plugins.sha256sum">SHA256 checksum</A> or, better, its
       <A HREF="/code/update-nessus-plugins/update-nessus-plugins.asc">GPG signature</A> against
       <A HREF="/~theall/gpg.html">my current GPG key</A>.</LI>
    <LI>Verify ownership and permissions on the script - it will need to
@@ -191,7 +191,7 @@ enable you to resolve the problem by yourself.</P>
 
 <H3>Copyright and License</H3>
 
-<P>Copyright (c) 2003-2008, George A. Theall.<BR>
+<P>Copyright (c) 2003-2010, George A. Theall.<BR>
 All rights reserved.</P>
 
 <P>This script is free software; you can redistribute it and/or modify
@@ -209,9 +209,21 @@ it under the same terms as Perl itself.</P>
       <TH ALIGN="left">Notes<BR></TH>
    </TR>
    <TR>
+      <TH ALIGN="left" VALIGN="top">31-Jan-2010 </TH>
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.37">1.37</A> </TD>
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.37.sha256sum">SHA256 checksum</A> / 
+         <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.37.asc">GPG</A> </TD>
+      <TD ALIGN="left" VALIGN="top">
+      <UL>
+        <LI>Changed location of plugins directory.</LI>
+        <LI>Ignored anything other than files when taking snapshots of the plugins directory.</LI>
+        <LI>Switched from MD5 to SHA256 checksums.</LI>
+      </UL></TD>
+   </TR>
+   <TR>
       <TH ALIGN="left" VALIGN="top">14-Dec-2008 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36">1.36</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.36.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -224,7 +236,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">27-May-2008 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.35">1.35</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.35.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.35.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.35.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -234,7 +246,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">17-May-2008 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.34">1.34</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.34.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.34.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.34.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -244,7 +256,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">12-Aug-2007 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.33">1.33</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.33.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.33.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.33.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -254,7 +266,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">03-Jul-2006 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.32">1.32</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.32.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.32.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.32.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -264,7 +276,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">02-Jul-2006 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.31">1.31</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.31.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.31.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.31.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -275,7 +287,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">19-Jul-2004 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.30">1.30</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.30.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.30.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.30.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -291,7 +303,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">09-Dec-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.20">1.20</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.20.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.20.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.20.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -311,7 +323,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">12-Oct-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.11">1.11</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.11.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.11.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.11.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -322,7 +334,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">10-Oct-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.10">1.10</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.10.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.10.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.10.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -333,7 +345,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">03-Sep-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.02">1.02</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.02.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.02.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.02.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -344,7 +356,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">30-Jun-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.01">1.01</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.01.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.01.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.01.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
@@ -356,7 +368,7 @@ it under the same terms as Perl itself.</P>
    <TR>
       <TH ALIGN="left" VALIGN="top">04-Jun-2003 </TH>
       <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.00">1.00</A> </TD>
-      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.00.md5">MD5</A> / 
+      <TD ALIGN="left" VALIGN="top"><A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.00.sha256sum">SHA256 checksum</A> / 
          <A HREF="/code/update-nessus-plugins/update-nessus-plugins-1.00.asc">GPG</A> </TD>
       <TD ALIGN="left" VALIGN="top">
       <UL>
