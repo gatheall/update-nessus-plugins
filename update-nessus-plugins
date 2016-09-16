@@ -5,12 +5,10 @@
 #
 # Written by George A. Theall, theall@tifaware.com
 #
-# Copyright (c) 2004-2010, George A. Theall. All rights reserved.
+# Copyright (c) 2004-2016, George A. Theall. All rights reserved.
 #
 # This module is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
-#
-# $Id$
 # ---------------------------------------------------------------------
 
 
@@ -91,13 +89,11 @@ distributions prior to 5.8.0 so you may need to install them yourself.
 Currently, I am not aware of any bugs in this script. 
 
 You need a working version of B<nessus-update-plugins> to use this
-script.  If you are having trouble getting that to work, please join
-C<nessus@list.nessus.org> (L<http://list.nessus.org>) and ask for
-assistance there. 
+script.
 
 If you wish to generate summary reports of new / changed plugins, you
 also need B<describe-nessus-plugin> version 2.01 or better, which is
-available from L<http://www.tifaware.com/perl/describe-nessus-plugin/>. 
+available from L<https://github.com/gatheall/describe-nessus-plugin>. 
 
 If you encounter an error similar to C<Insecure dependency in chdir
 while running with -T switch at /usr/lib/perl/5.00503/File/Find.pm line
@@ -133,8 +129,8 @@ reported to stderr using C<warn>.
 =head1 SEE ALSO
 
 L<nessus-update-plugins(5)>,
-L<http://www.tifaware.com/perl/describe-nessus-plugin/>,
-L<http://www.tifaware.com/perl/update-nessus-plugins/>.
+L<https://github.com/gatheall/describe-nessus-plugin>,
+L<https://github.com/gatheall/update-nessus-plugins>.
 
 =cut
 
